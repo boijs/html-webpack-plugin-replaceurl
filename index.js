@@ -36,8 +36,7 @@ HtmlWebpackReplaceurlPlugin.prototype.replaceUrl = function(compilation, htmlWeb
 
     let _html = htmlPluginData.html;
     let _assets = htmlPluginData.assets;
-    console.log(htmlPluginData)
-        // 替换js url
+    // 替换js url
     for (let i = 0, len = _assets.js.length; i < len; i++) {
         let jsFile = _assets.js[i];
         if (REG_JS_FILENAME.test(jsFile)) {
