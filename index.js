@@ -1,12 +1,18 @@
+/**
+ * 替换html中静态资源的url
+ */
 'use strict';
 let fs = require('fs');
 let path = require('path');
-
+// 默认配置
+// mainFilePrefix: 文件名前缀，用来正则匹配待替换文件名
+// vendor：如果需要插入vendor文件请务必配置此项，value是需插入的文件名，与webpack配置保持一致
 const DEFAULT_OPTIONS = {
     mainFilePrefix: {
         js: 'main',
         css: 'main'
-    }
+    },
+    vendor: 'vendor.js'
 };
 
 let HtmlWebpackReplaceurlPlugin = function(options) {
@@ -16,7 +22,7 @@ let HtmlWebpackReplaceurlPlugin = function(options) {
 HtmlWebpackReplaceurlPlugin.prototype.apply = function(compiler) {
     let _this = this;
     compiler.plugin('compilation', function(compilation) {
-        compilation.plugin('html-webpack-plugin-before-html-processing', function(htmlPluginData, callback) {
+        compilation.plugin('html-webpack-plugin-after-html-processing', function(htmlPluginData, callback) {
             _this.replaceUrl(compilation, htmlPluginData.plugin.options, htmlPluginData, callback);
         });
     });
@@ -29,9 +35,9 @@ HtmlWebpackReplaceurlPlugin.prototype.replaceUrl = function(compilation, htmlWeb
     const REG_CSS_FILENAME = new RegExp(_this.options.mainFilePrefix.css + '\\.\\w+');
 
     let _html = htmlPluginData.html;
-
     let _assets = htmlPluginData.assets;
-    let _entries = compilation.compiler.options.entry;
+
+    // 替换js url
     for (let i = 0, len = _assets.js.length; i < len; i++) {
         let jsFile = _assets.js[i];
         if (REG_JS_FILENAME.test(jsFile)) {
@@ -39,12 +45,18 @@ HtmlWebpackReplaceurlPlugin.prototype.replaceUrl = function(compilation, htmlWeb
             _html = _html.replace(_srcFile, jsFile);
         }
     }
+    // 替换css url
     for (let i = 0, len = _assets.css.length; i < len; i++) {
         let cssFile = _assets.css[i];
         if (REG_CSS_FILENAME.test(cssFile)) {
             let _srcFile = REG_CSS_FILENAME.exec(cssFile) + '.css';
             _html = _html.replace(_srcFile, cssFile);
         }
+    }
+    // 插入vendor文件
+    // @todo 目前需要手动在html中写入vendor文件，后续会研究如何自动插入
+    if (_this.options.vendor && _assets.chunks.hasOwnProperty('vendor')) {
+        _html = _html.replace(_this.options.vendor, _assets.chunks.vendor.entry);
     }
     htmlPluginData.html = _html;
 
