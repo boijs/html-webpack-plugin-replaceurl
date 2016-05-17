@@ -22,7 +22,7 @@ let HtmlWebpackReplaceurlPlugin = function(options) {
 HtmlWebpackReplaceurlPlugin.prototype.apply = function(compiler) {
     let _this = this;
     compiler.plugin('compilation', function(compilation) {
-        compilation.plugin('html-webpack-plugin-after-html-processing', function(htmlPluginData, callback) {
+        compilation.plugin('html-webpack-plugin-before-html-processing', function(htmlPluginData, callback) {
             _this.replaceUrl(compilation, htmlPluginData.plugin.options, htmlPluginData, callback);
         });
     });
@@ -36,12 +36,12 @@ HtmlWebpackReplaceurlPlugin.prototype.replaceUrl = function(compilation, htmlWeb
 
     let _html = htmlPluginData.html;
     let _assets = htmlPluginData.assets;
-
-    // 替换js url
+    console.log(htmlPluginData)
+        // 替换js url
     for (let i = 0, len = _assets.js.length; i < len; i++) {
         let jsFile = _assets.js[i];
         if (REG_JS_FILENAME.test(jsFile)) {
-            let _srcFile = REG_JS_FILENAME.exec(jsFile) + '.js';
+            let _srcFile = new RegExp(REG_JS_FILENAME.exec(jsFile) + '\\.js', 'g');
             _html = _html.replace(_srcFile, jsFile);
         }
     }
@@ -49,7 +49,7 @@ HtmlWebpackReplaceurlPlugin.prototype.replaceUrl = function(compilation, htmlWeb
     for (let i = 0, len = _assets.css.length; i < len; i++) {
         let cssFile = _assets.css[i];
         if (REG_CSS_FILENAME.test(cssFile)) {
-            let _srcFile = REG_CSS_FILENAME.exec(cssFile) + '.css';
+            let _srcFile = new RegExp(REG_CSS_FILENAME.exec(cssFile) + '\\.css', 'g');
             _html = _html.replace(_srcFile, cssFile);
         }
     }
