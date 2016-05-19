@@ -31,8 +31,8 @@ HtmlWebpackReplaceurlPlugin.prototype.apply = function(compiler) {
 HtmlWebpackReplaceurlPlugin.prototype.replaceUrl = function(compilation, htmlWebpackPluginOptions, htmlPluginData,
     callback) {
     let _this = this;
-    const REG_JS_FILENAME = new RegExp(_this.options.mainFilePrefix.js + '\\.\\w+');
-    const REG_CSS_FILENAME = new RegExp(_this.options.mainFilePrefix.css + '\\.\\w+');
+    const REG_JS_FILENAME = new RegExp(_this.options.mainFilePrefix.js + '[\\.\\w+]+\\.js', 'g');
+    const REG_CSS_FILENAME = new RegExp(_this.options.mainFilePrefix.css + '[\\.\\w+]+\\.css', 'g');
 
     let _html = htmlPluginData.html;
     let _assets = htmlPluginData.assets;
@@ -40,16 +40,14 @@ HtmlWebpackReplaceurlPlugin.prototype.replaceUrl = function(compilation, htmlWeb
     for (let i = 0, len = _assets.js.length; i < len; i++) {
         let jsFile = _assets.js[i];
         if (REG_JS_FILENAME.test(jsFile)) {
-            let _srcFile = new RegExp(REG_JS_FILENAME.exec(jsFile) + '\\.js', 'g');
-            _html = _html.replace(_srcFile, jsFile);
+            _html = _html.replace(REG_JS_FILENAME, jsFile);
         }
     }
     // 替换css url
     for (let i = 0, len = _assets.css.length; i < len; i++) {
         let cssFile = _assets.css[i];
         if (REG_CSS_FILENAME.test(cssFile)) {
-            let _srcFile = new RegExp(REG_CSS_FILENAME.exec(cssFile) + '\\.css', 'g');
-            _html = _html.replace(_srcFile, cssFile);
+            _html = _html.replace(REG_CSS_FILENAME, cssFile);
         }
     }
     // 插入vendor文件
