@@ -39,16 +39,25 @@ HtmlWebpackReplaceurlPlugin.prototype.replaceUrl = function(compilation, htmlWeb
     // 替换js url
     for (let i = 0, len = _assets.js.length; i < len; i++) {
         let jsFile = _assets.js[i];
-        if (REG_JS_FILENAME.test(jsFile)) {
-            _html = _html.replace(REG_JS_FILENAME, jsFile);
-        }
+        let _arr = jsFile.split('/');
+        let _name = _arr[_arr.length-1];
+        // console.log(_name)
+        // if (REG_JS_FILENAME.test(jsFile)) {
+            let _originName = _name.split(/\.\w+\.js$/.exec(_name))[0]+'.js';
+            // console.log(_originName)
+            _html = _html.replace(_originName, jsFile);
+        // }
     }
     // 替换css url
     for (let i = 0, len = _assets.css.length; i < len; i++) {
         let cssFile = _assets.css[i];
-        if (REG_CSS_FILENAME.test(cssFile)) {
-            _html = _html.replace(REG_CSS_FILENAME, cssFile);
-        }
+        let _arr = cssFile.split('/');
+        let _name = _arr[_arr.length-1];
+        let _originName = _name.split(/\.\w+\.css$/.exec(_name))[0]+'.css';
+
+        // if (REG_CSS_FILENAME.test(cssFile)) {
+            _html = _html.replace(_originName, cssFile);
+        // }
     }
     // 插入vendor文件
     // @todo 目前需要手动在html中写入vendor文件，后续会研究如何自动插入
