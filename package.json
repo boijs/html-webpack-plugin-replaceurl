@@ -1,6 +1,6 @@
 {
   "name": "html-webpack-replaceurl-plugin",
-  "version": "0.0.4",
+  "version": "0.0.5",
   "description": "repalce static files' url in html",
   "main": "index.js",
   "keywords": [
