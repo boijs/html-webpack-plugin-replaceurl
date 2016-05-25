@@ -31,8 +31,8 @@ HtmlWebpackReplaceurlPlugin.prototype.apply = function(compiler) {
 HtmlWebpackReplaceurlPlugin.prototype.replaceUrl = function(compilation, htmlWebpackPluginOptions, htmlPluginData,
     callback) {
     let _this = this;
-    const REG_JS_FILENAME = new RegExp(_this.options.mainFilePrefix.js + '[\\.\\w+]+\\.js', 'g');
-    const REG_CSS_FILENAME = new RegExp(_this.options.mainFilePrefix.css + '[\\.\\w+]+\\.css', 'g');
+    const REG_JS_FILENAME = new RegExp(_this.options.mainFilePrefix.js + '[\\.\\w+]+\\.js');
+    const REG_CSS_FILENAME = new RegExp(_this.options.mainFilePrefix.css + '[\\.\\w+]+\\.css');
 
     let _html = htmlPluginData.html;
     let _assets = htmlPluginData.assets;
@@ -40,29 +40,33 @@ HtmlWebpackReplaceurlPlugin.prototype.replaceUrl = function(compilation, htmlWeb
     for (let i = 0, len = _assets.js.length; i < len; i++) {
         let jsFile = _assets.js[i];
         let _arr = jsFile.split('/');
-        let _name = _arr[_arr.length-1];
-        // console.log(_name)
-        // if (REG_JS_FILENAME.test(jsFile)) {
-            let _originName = _name.split(/\.\w+\.js$/.exec(_name))[0]+'.js';
-            // console.log(_originName)
-            _html = _html.replace(_originName, jsFile);
-        // }
+        let _filename = _arr[_arr.length - 1];
+        let _regJsSrc = null;
+        if (REG_JS_FILENAME.test(jsFile)) {
+            let _originName = _filename.split(/\.[a-z0-9]+\.js$/.exec(_filename))[0] + '.js';
+            _regJsSrc = new RegExp('[\.A-Za-z0-9_\/]+' + _originName.split('.').join('\\.'), 'g');
+        }
+        _html = _html.replace(_regJsSrc, jsFile);
     }
     // 替换css url
     for (let i = 0, len = _assets.css.length; i < len; i++) {
         let cssFile = _assets.css[i];
         let _arr = cssFile.split('/');
-        let _name = _arr[_arr.length-1];
-        let _originName = _name.split(/\.\w+\.css$/.exec(_name))[0]+'.css';
-
-        // if (REG_CSS_FILENAME.test(cssFile)) {
-            _html = _html.replace(_originName, cssFile);
-        // }
+        let _filename = _arr[_arr.length - 1];
+        let _regCssSrc = null;
+        if (REG_CSS_FILENAME.test(cssFile)) {
+            let _originName = _filename.split(/\.[a-z0-9]+\.css$/.exec(_filename))[0] + '.css';
+            _regCssSrc = new RegExp('[\.A-Za-z0-9_\/]+' + _originName.split('.').join('\\.'), 'g');
+        } else {
+            _regCssSrc = new RegExp('[\.A-Za-z0-9_\/]+' + _filename.split('.').join('\\.'), 'g');
+        }
+        _html = _html.replace(_regCssSrc, cssFile);
     }
     // 插入vendor文件
     // @todo 目前需要手动在html中写入vendor文件，后续会研究如何自动插入
     if (_this.options.vendor && _assets.chunks.hasOwnProperty('vendor')) {
-        _html = _html.replace(_this.options.vendor, _assets.chunks.vendor.entry);
+        let _regJsSrc = new RegExp('[\.A-Za-z0-9_\/]+' + _this.options.vendor.split('.').join('\\.'), 'g');
+        _html = _html.replace(_regJsSrc, _assets.chunks.vendor.entry);
     }
     htmlPluginData.html = _html;
 
