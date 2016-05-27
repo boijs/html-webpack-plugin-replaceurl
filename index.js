@@ -44,7 +44,7 @@ HtmlWebpackReplaceurlPlugin.prototype.replaceUrl = function(compilation, htmlWeb
         let _regJsSrc = null;
         if (REG_JS_FILENAME.test(jsFile)) {
             let _originName = _filename.split(/\.[a-z0-9]+\.js$/.exec(_filename))[0] + '.js';
-            _regJsSrc = new RegExp('[\.A-Za-z0-9_\/]+' + _originName.split('.').join('\\.'), 'g');
+            _regJsSrc = new RegExp('[\.A-Za-z0-9_\/]*' + _originName.split('.').join('\\.'), 'g');
         }
         _html = _html.replace(_regJsSrc, jsFile);
     }
@@ -56,9 +56,9 @@ HtmlWebpackReplaceurlPlugin.prototype.replaceUrl = function(compilation, htmlWeb
         let _regCssSrc = null;
         if (REG_CSS_FILENAME.test(cssFile)) {
             let _originName = _filename.split(/\.[a-z0-9]+\.css$/.exec(_filename))[0] + '.css';
-            _regCssSrc = new RegExp('[\.A-Za-z0-9_\/]+' + _originName.split('.').join('\\.'), 'g');
+            _regCssSrc = new RegExp('[\.A-Za-z0-9_\/]*' + _originName.split('.').join('\\.'), 'g');
         } else {
-            _regCssSrc = new RegExp('[\.A-Za-z0-9_\/]+' + _filename.split('.').join('\\.'), 'g');
+            _regCssSrc = new RegExp('[\.A-Za-z0-9_\/]*' + _filename.split('.').join('\\.'), 'g');
         }
         _html = _html.replace(_regCssSrc, cssFile);
     }
