@@ -31,8 +31,8 @@ HtmlWebpackReplaceurlPlugin.prototype.apply = function(compiler) {
 HtmlWebpackReplaceurlPlugin.prototype.replaceUrl = function(compilation, htmlWebpackPluginOptions, htmlPluginData,
     callback) {
     let _this = this;
-    const REG_JS_FILENAME = new RegExp(_this.options.mainFilePrefix.js + '[\\.\\w+]+\\.js');
-    const REG_CSS_FILENAME = new RegExp(_this.options.mainFilePrefix.css + '[\\.\\w+]+\\.css');
+    const REG_JS_FILENAME = new RegExp(_this.options.mainFilePrefix.js + '[\\.\\w-]+\\.js');
+    const REG_CSS_FILENAME = new RegExp(_this.options.mainFilePrefix.css + '[\\.\\w-]+\\.css');
 
     let _html = htmlPluginData.html;
     let _assets = htmlPluginData.assets;
