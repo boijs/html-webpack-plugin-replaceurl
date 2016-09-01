@@ -9,5 +9,8 @@
     "cdn"
   ],
   "author": "zhoujunpeng",
-  "license": "ISC"
+  "license": "ISC",
+  "dependencies": {
+    "lodash": "^4.15.0"
+  }
 }
