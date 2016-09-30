@@ -80,8 +80,7 @@ HtmlWebpackPluginReplaceurl.prototype.replaceUrl = function(htmlPluginData, call
         0] + 'js' : _filename;
       _regJsSrc = new RegExp('src\\s?=\\s?(\'|\")' + '[\\.\\w\/]*' + _originName.split('.').join(
         '\\.') + '(\'|\")', 'g');
-      let _targetName = '';
-      _urlPrefix && (_targetName = _urlPrefix + _jsFile);
+      let _targetName = _urlPrefix ? _urlPrefix + _jsFile : _jsFile;
       _urlTimestamp && (_targetName += '?' + _urlTimestamp);
       _html = _html.replace(_regJsSrc, 'src = \"' + _targetName + '\"');
     }
@@ -96,8 +95,7 @@ HtmlWebpackPluginReplaceurl.prototype.replaceUrl = function(htmlPluginData, call
         _filename))[0] + 'css' : _filename;
       _regCssSrc = new RegExp('href\\s?=\\s?(\'|\")' + '[\.\\w\/]*' + _originName.split('.').join(
         '\\.') + '(\'|\")', 'g');
-      let _targetName = '';
-      _urlPrefix && (_targetName = _urlPrefix + _cssFile);
+      let _targetName = _urlPrefix ? _urlPrefix + _cssFile : _cssFile;
       _urlTimestamp && (_targetName += '?' + _urlTimestamp);
       _html = _html.replace(_regCssSrc, 'href = \"' + _targetName + '\"');
     }
