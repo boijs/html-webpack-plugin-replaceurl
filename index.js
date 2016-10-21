@@ -76,7 +76,7 @@ HtmlWebpackPluginReplaceurl.prototype.replaceUrl = function(htmlPluginData, call
     let _filename = _.last(_jsFile.split('/'));
     let _regJsSrc = null;
     if (REG_JS_FILENAME.test(_jsFile)) {
-      let _originName = _this.options.js.useHash ? _filename.split(/[a-z\d]+\.js$/.exec(_filename))[
+      let _originName = _this.options.js.useHash ? _filename.split(/[\w-]+\.js$/.exec(_filename))[
         0] + 'js' : _filename;
       _regJsSrc = new RegExp('src\\s?=\\s?(\'|\")' + '[\\.\\w\/]*' + _originName.split('.').join(
         '\\.') + '(\'|\")', 'g');
@@ -91,7 +91,7 @@ HtmlWebpackPluginReplaceurl.prototype.replaceUrl = function(htmlPluginData, call
     let _filename = _.last(_cssFile.split('/'));
     let _regCssSrc = null;
     if (REG_CSS_FILENAME.test(_cssFile)) {
-      let _originName = _this.options.style.useHash ? _filename.split(/[a-z\d]+\.css$/.exec(
+      let _originName = _this.options.style.useHash ? _filename.split(/[\w-]+\.css$/.exec(
         _filename))[0] + 'css' : _filename;
       _regCssSrc = new RegExp('href\\s?=\\s?(\'|\")' + '[\.\\w\/]*' + _originName.split('.').join(
         '\\.') + '(\'|\")', 'g');
