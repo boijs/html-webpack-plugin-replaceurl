@@ -59,8 +59,8 @@ HtmlWebpackPluginReplaceurl.prototype.apply = function(compiler) {
 HtmlWebpackPluginReplaceurl.prototype.replaceUrl = function(htmlPluginData, callback) {
   let _this = this;
   // js和css文件名匹配正则
-  const REG_JS_FILENAME = new RegExp(_this.options.js.mainFilePrefix + '[\\.\\w+]+\\.js$');
-  const REG_CSS_FILENAME = new RegExp(_this.options.style.mainFilePrefix + '[\\.\\w+]+\\.css$');
+  const REG_JS_FILENAME = new RegExp(_this.options.js.mainFilePrefix + '[\\.\\-\\w+]+\\.js$');
+  const REG_CSS_FILENAME = new RegExp(_this.options.style.mainFilePrefix + '[\\.\\-\\w+]+\\.css$');
   // html内容文本
   let _html = htmlPluginData.html;
   // 静态资源汇总对象
