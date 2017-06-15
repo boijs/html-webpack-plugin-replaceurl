@@ -35,11 +35,28 @@ let webpackConfig = {
           inject: false, //此项必须配置为false
       }),
       new HtmlWebpackReplaceurlPlugin({
-          mainFilePrefix: {
-              js: 'main',
-              css: 'main'
-          },
-          vendor: 'vendor.js'
+        // 解析模式：strict-严格模式；loose-宽松模式
+        mode: 'loose',
+        js: {
+          // 文件名前缀
+          mainFilePrefix: 'main',
+          // 代替换文件名是否包含hash指纹
+          useHash: false,
+          // 文件名分隔符，默认文件名规范为main.[name].js
+          separator: '.',
+          // 是否存在common模块
+          common: true,
+        },
+        css: {
+          // 文件名前缀
+          mainFilePrefix: 'main',
+          // 是否使用hash
+          useHash: false,
+          // 文件名分隔符，默认文件名规范为main.[name].css
+          separator: '.'
+        },
+        // 是否在url末尾加入时间戳，默认false
+        urlTimestamp: false
       })]
 };
 ```
@@ -75,7 +92,8 @@ let webpackConfig = {
 </html>
 ```
 
-### 详细配置
+### 模式选择
+* `loose`-宽松模式，使用正则匹配，准确度略低；
+* `strict`-严格模式，解析html文档100%匹配准确度。
 
--	`mainFilePrefix`:js/style文件的命名前缀，以此前缀匹配html文档中的文件引用。默认都是`main`；
--	`vendor`:是否需要匹配vendor文件，如果为false，则不匹配html文档中的vendor文件。默认匹配`vendor.js`。
+详细原理请参考[boi-资源定位](https://boijs.github.io/docs/#/_multipage-location)。
