@@ -163,7 +163,7 @@ HtmlWebpackPluginReplaceurl.prototype.replaceUrlLoose = function (
   let self = this;
   // js和css文件名匹配正则
   const REG_JS_FILENAME = new RegExp(
-    `${self.options.js.mainFilePrefix}[\\.\\-\\w+]+\\.js$`);
+    `(${self.options.js.mainFilePrefix}|common)[\\.\\-\\w+]+\\.js$`);
   const REG_CSS_FILENAME = new RegExp(self.options.css.mainFilePrefix +
     '[\\.\\-\\w+]+\\.css$');
   // html内容文本
