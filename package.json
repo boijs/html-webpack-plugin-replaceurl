@@ -1,15 +1,22 @@
 {
   "name": "html-webpack-plugin-replaceurl",
-  "version": "1.1.1",
+  "version": "1.1.2",
   "description": "repalce static files' url in html",
   "main": "index.js",
   "keywords": [
     "webpack",
     "html",
-    "cdn"
+    "boi"
   ],
-  "author": "zhoujunpeng",
-  "license": "ISC",
+  "scripts": {
+    "lint": "eslint index.js"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/boijs/html-webpack-plugin-replaceurl"
+  },
+  "author": "zhoujunpeng <zjp0432@163.com> (https://github.com/zhoujunpeng)",
+  "license": "MIT",
   "dependencies": {
     "lodash": "^4.15.0",
     "parse5": "^3.0.2"

@@ -1,5 +1,6 @@
-Html Webpack Replaceurl Plugin
-==============================
+# Html Webpack Replaceurl Plugin
+[![license](https://img.shields.io/github/license/boijs/boi.svg?style=plastic)](https://github.com/boijs/boi/blob/master/LICENSE)
+[![npm](https://img.shields.io/npm/v/html-webpack-plugin-replaceurl.svg?style=plastic)](https://www.npmjs.com/package/html-webpack-plugin-replaceurl)
 
 此插件需配合[html-webpack-plugin](https://github.com/ampedandwired/html-webpack-plugin)使用，作用是将html文档中对本地静态资源（js/style）的引用替换为经webpack编译后url。
 
@@ -46,6 +47,11 @@ let webpackConfig = {
           separator: '.',
           // 是否存在common模块
           common: true,
+          // dll文件信息
+          dll: {
+            name: 'webapp.dll.js',
+            url: '/js/webapp.dll.js'
+          }
         },
         css: {
           // 文件名前缀

@@ -1,7 +1,5 @@
-'use strict';
-
-const _ = require('lodash');
-const Path = require('path');
+const _       = require('lodash');
+const Path    = require('path');
 const Parser5 = require('parse5');
 
 const DEFAULT_OPTIONS = {
@@ -14,6 +12,7 @@ const DEFAULT_OPTIONS = {
     useHash: false,
     separator: '.',
     common: true,
+    dll: undefined
   },
   css: {
     mainFilePrefix: 'main',
@@ -30,8 +29,7 @@ function ParseHtmlContent(html) {
   const Document = Parser5.parse(html);
 
   if (Document.childNodes[1].tagName !== 'html') {
-    throw new Error("Html document is invalid");
-    process.exit();
+    throw new Error('Html document is invalid');
   }
 
   const HtmlNode = Document.childNodes[1];
@@ -52,8 +50,7 @@ function ParseHtmlContent(html) {
   });
 
   if (!bodyNode || !headNode) {
-    throw new Error("Html document is invalid");
-    process.exit();
+    throw new Error('Html document is invalid');
   }
   bodyNode.node.childNodes.forEach((node, index) => {
     let tagName = node.tagName;
@@ -130,7 +127,7 @@ function SerializeHtmlContent(nodeTree) {
  * @constructor
  * @param  {Object} options 配置项
  */
-let HtmlWebpackPluginReplaceurl = function (options) {
+function HtmlWebpackPluginReplaceurl(options) {
   this.options = Object.assign({}, DEFAULT_OPTIONS, options);
 }
 
@@ -139,25 +136,25 @@ let HtmlWebpackPluginReplaceurl = function (options) {
  * @param  {Object} compiler webpack compiler对象
  */
 HtmlWebpackPluginReplaceurl.prototype.apply = function (compiler) {
-    let self = this;
-    compiler.plugin('compilation', function (compilation) {
-      compilation.plugin('html-webpack-plugin-before-html-processing',
-        function (htmlPluginData, callback) {
-          if (self.options.mode === 'strict') {
-            self.replaceUrlStrict(htmlPluginData, callback);
-          } else {
-            self.replaceUrlLoose(htmlPluginData, callback);
-          }
-        });
-    });
-  }
-  /**
-   * @method
-   * @desc 替换资源地址-宽松模式
-   * @param  {Object}   htmlPluginData           html数据
-   * @param  {Function} callback                 回调函数
-   * @return null
-   */
+  let self = this;
+  compiler.plugin('compilation', function (compilation) {
+    compilation.plugin('html-webpack-plugin-before-html-processing',
+      function (htmlPluginData, callback) {
+        if (self.options.mode === 'strict') {
+          self.replaceUrlStrict(htmlPluginData, callback);
+        } else {
+          self.replaceUrlLoose(htmlPluginData, callback);
+        }
+      });
+  });
+};
+/**
+ * @method
+ * @desc 替换资源地址-宽松模式
+ * @param  {Object}   htmlPluginData           html数据
+ * @param  {Function} callback                 回调函数
+ * @return null
+ */
 HtmlWebpackPluginReplaceurl.prototype.replaceUrlLoose = function (
   htmlPluginData, callback) {
   let self = this;
@@ -180,17 +177,31 @@ HtmlWebpackPluginReplaceurl.prototype.replaceUrlLoose = function (
   if (self.options.js.common && assets.chunks.hasOwnProperty('common')) {
     assets.js.push(assets.chunks.common.entry);
   }
+
+  if (self.options.js.dll) {
+    assets.js.push({
+      type: 'dll',
+      name: self.options.js.dll.name,
+      url: self.options.js.dll.url
+    });
+  }
   // 替换Script标签的src url
   assets.js.forEach(file => {
-    let targetName = Path.basename(file, '.js');
-    if (REG_JS_FILENAME.test(file)) {
-      let originName = !self.options.js.useHash ? targetName :
-        _.dropRight(targetName.split(self.options.js.separator)).join(
-          self.options.js.separator);
+    if (_.isPlainObject(file) && file.type === 'dll') {
       const RegJsSrc = new RegExp(
-        `src\\s*=\\s*(\'|\")[\\.\\w\/]*${originName}\\.js(\'|\")`, 'g');
-      urlTimestamp && (file += `?t=${urlTimestamp}`);
-      htmlContent = htmlContent.replace(RegJsSrc, `src=\"${file}\"`);
+        `src\\s*=\\s*(\'|\")[\\.\\w\/]*${file.name.replace('.','\\.')}(\'|\")`, 'g');
+      htmlContent = htmlContent.replace(RegJsSrc, `src=\"${file.url}\"`);
+    } else {
+      let targetName = Path.basename(file, '.js');
+      if (REG_JS_FILENAME.test(file)) {
+        let originName = !self.options.js.useHash ? targetName :
+          _.dropRight(targetName.split(self.options.js.separator)).join(
+            self.options.js.separator);
+        const RegJsSrc = new RegExp(
+          `src\\s*=\\s*(\'|\")[\\.\\w\/]*${originName}\\.js(\'|\")`, 'g');
+        urlTimestamp && (file += `?t=${urlTimestamp}`);
+        htmlContent = htmlContent.replace(RegJsSrc, `src=\"${file}\"`);
+      }
     }
   });
 
@@ -213,7 +224,7 @@ HtmlWebpackPluginReplaceurl.prototype.replaceUrlLoose = function (
   htmlPluginData.html = htmlContent;
   // 插件执行完毕之后必须执行回调函数，否则编译终止
   callback(null, htmlPluginData);
-}
+};
 
 /**
  * @method
@@ -238,21 +249,25 @@ HtmlWebpackPluginReplaceurl.prototype.replaceUrlStrict = function (
     AssetsJS.push(Assets.chunks.common.entry);
   }
 
-  // 生成时间戳，false时为null
-  const UrlTimestamp = this.options.urlTimestamp && (new Date()).getTime() ||
-    null;
+  if (this.options.js.dll) {
+    AssetsJS.push({
+      type: 'dll',
+      url: this.options.js.dll.url
+    });
+  }
 
   let targetScriptNodes = [];
 
   while (ScriptNodes.length > 0 && AssetsJS.length > 0) {
-    let targetUrl = AssetsJS[0];
+    let targetUrl = _.isPlainObject(AssetsJS[0]) && AssetsJS[0].type === 'dll' ? AssetsJS[0].url : AssetsJS[0];
     let targetName = Path.basename(targetUrl, '.js');
-    let originName = !this.options.js.useHash ? targetName :
+    let originName = AssetsJS[0].type === 'dll' || !this.options.js.useHash ? targetName :
       _.dropRight(targetName.split(this.options.js.separator)).join(this.options
         .js.separator);
     for (let i = 0, len = ScriptNodes.length; i < len; i++) {
       let attrs = ScriptNodes[i] && ScriptNodes[i].node && [...ScriptNodes[i]
-        .node.attrs] || [];
+        .node.attrs
+      ] || [];
       let isMatch = false;
 
       if (attrs.length > 0) {
@@ -289,7 +304,8 @@ HtmlWebpackPluginReplaceurl.prototype.replaceUrlStrict = function (
 
     for (let i = 0, len = StyleNodes.length; i < len; i++) {
       let attrs = StyleNodes[i] && StyleNodes[i].node && [...StyleNodes[i].node
-        .attrs] || [];
+        .attrs
+      ] || [];
       let isMatch = false;
       if (attrs.length > 0) {
         StyleNodes[i].node.attrs = attrs.map(attr => {
